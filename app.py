@@ -3,9 +3,9 @@ from flask import render_template, jsonify,request
 from flask_cors import CORS
 import pizzas
 from models import Person
-from people import read_all, create, read_one_by_dni, update, delete
+from people import read_all, create, read_one_by_dni, delete
 from flask import Flask, jsonify, request
-
+import people
 
 app = config.connex_app
 app.add_api(config.basedir / "swagger.yml")
@@ -27,10 +27,10 @@ app.add_url_rule('/api/create_people', 'create_people', create, methods=['POST']
 def get_person_by_dni(dni):
     return read_one_by_dni(dni)  # Llama a la función de people.py
 
-@app.route("/api/clientes/<lname>", methods=["PUT"])
-def update_person(lname):
+@app.route("/api/clientes/<id>", methods=["PUT"])
+def update_person(id):
     person_data = request.get_json()  # Obtener los datos de la solicitud
-    return update(lname, person_data)
+    return people.update(id, person_data)
 
 # Ruta para eliminar un cliente por su apellido (lname)
 @app.route("/api/clientes/<lname>", methods=["DELETE"])

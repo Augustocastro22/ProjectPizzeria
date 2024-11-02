@@ -2,14 +2,15 @@ import logo from './logo.svg';
 import './ListadoClientes.css';
 
 import React, { useEffect, useState } from 'react';
-import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
+import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Button } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
 function ListadoClientes() {
   const [clientes, setClientes] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(''); // Estado para la búsqueda por apellido
+  const [editingClienteId, setEditingClienteId] = useState(null);
+  const [editedCliente, setEditedCliente] = useState({});
+const [searchTerm, setSearchTerm] = useState(''); // Estado para la búsqueda por apellido
   const [dniSearchTerm, setDniSearchTerm] = useState(''); // Estado para la búsqueda por DNI
-
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/clientes')
       .then((response) => {
@@ -27,16 +28,17 @@ function ListadoClientes() {
   }, []);
 
   const handleEdit = (cliente) => {
-    const nuevoNombre = prompt("Nuevo nombre:", cliente.fname);
-    if (!nuevoNombre) return;
-    const updatedCliente = { fname: nuevoNombre };
+    setEditingClienteId(cliente.id);
+    setEditedCliente(cliente);
+  };
 
-    fetch(`http://127.0.0.1:8000/api/clientes/${cliente.lname}`, {
+  const handleSave = () => {
+    fetch(`http://127.0.0.1:8000/api/clientes/${editedCliente.id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(updatedCliente)
+      body: JSON.stringify(editedCliente)
     })
     .then((response) => {
       if (!response.ok) {
@@ -46,34 +48,38 @@ function ListadoClientes() {
     })
     .then((updatedCliente) => {
       setClientes((prevClientes) =>
-        prevClientes.map((c) => (c.lname === cliente.lname ? updatedCliente : c))
+        prevClientes.map((c) => (c.id === updatedCliente.id ? updatedCliente : c))
       );
+      setEditingClienteId(null);
+      setEditedCliente({});
     })
     .catch((error) => console.error('Error al editar el cliente:', error));
   };
 
-  const handleDelete = (lname) => {
-    const confirmDelete = window.confirm(`¿Estás seguro de que deseas eliminar a ${lname}?`);
+  const handleDelete = (id) => {
+    const confirmDelete = window.confirm(`¿Estás seguro de que deseas eliminar este cliente?`);
     if (confirmDelete) {
-      fetch(`http://127.0.0.1:8000/api/clientes/${lname}`, {
+      fetch(`http://127.0.0.1:8000/api/clientes/${id}`, {
         method: 'DELETE'
       })
       .then((response) => {
         if (!response.ok) {
           throw new Error('Error al eliminar el cliente');
         }
-        setClientes((prevClientes) => prevClientes.filter((c) => c.lname !== lname));
+        setClientes((prevClientes) => prevClientes.filter((c) => c.id !== id));
       })
       .catch((error) => console.error('Error al eliminar el cliente:', error));
     }
   };
 
-  // Filtrar clientes en base al término de búsqueda de apellido y coincidencia inicial en DNI
-  const filteredClientes = clientes.filter((cliente) =>
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedCliente({ ...editedCliente, [name]: value });
+  };
+const filteredClientes = clientes.filter((cliente) =>
     cliente.lname.toLowerCase().includes(searchTerm.toLowerCase()) &&
     cliente.dni.toString().startsWith(dniSearchTerm) // Verifica que el DNI empiece con los caracteres de búsqueda
   );
-
   return (
     <div className="ListadoClientes">
       <header className="ListadoClientes-header">
@@ -110,14 +116,50 @@ function ListadoClientes() {
             <TableBody>
               {filteredClientes.map((cliente) => (
                 <TableRow key={cliente.id}>
-                  <TableCell>{cliente.dni}</TableCell>
-                  <TableCell>{cliente.fname}</TableCell>
-                  <TableCell>{cliente.lname}</TableCell>
                   <TableCell>
-                    <IconButton color="primary" onClick={() => handleEdit(cliente)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton color="secondary" onClick={() => handleDelete(cliente.lname)}>
+                    {editingClienteId === cliente.id ? (
+                      <TextField
+                        name="dni"
+                        value={editedCliente.dni}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      cliente.dni
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingClienteId === cliente.id ? (
+                      <TextField
+                        name="fname"
+                        value={editedCliente.fname}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      cliente.fname
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingClienteId === cliente.id ? (
+                      <TextField
+                        name="lname"
+                        value={editedCliente.lname}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      cliente.lname
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingClienteId === cliente.id ? (
+                      <Button variant="contained" color="primary" onClick={handleSave}>
+                        Guardar
+                      </Button>
+                    ) : (
+                      <IconButton color="primary" onClick={() => handleEdit(cliente)}>
+                        <EditIcon />
+                      </IconButton>
+                    )}
+                    <IconButton color="secondary" onClick={() => handleDelete(cliente.id)}>
                       <DeleteIcon />
                     </IconButton>
                   </TableCell>

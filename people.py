@@ -40,8 +40,8 @@ def read_one(lname):
         abort(404, f"Person with last name {lname} not found")
 
 
-def update(lname, person):
-    existing_person = Person.query.filter(Person.lname == lname).one_or_none()
+def update(id, person):
+    existing_person = Person.query.filter(Person.id == id).one_or_none()
 
     if existing_person:
         update_person = person_schema.load(person, session=db.session)
@@ -50,15 +50,15 @@ def update(lname, person):
         db.session.commit()
         return person_schema.dump(existing_person), 201
     else:
-        abort(404, f"Person with last name {lname} not found")
+        abort(404, f"Person with id {id} not found")
 
 
-def delete(lname):
-    existing_person = Person.query.filter(Person.lname == lname).one_or_none()
+def delete(id):
+    existing_person = Person.query.filter(Person.id == id).one_or_none()
 
     if existing_person:
         db.session.delete(existing_person)
         db.session.commit()
-        return make_response(f"{lname} successfully deleted", 200)
+        return make_response(f"{id} successfully deleted", 200)
     else:
-        abort(404, f"Person with last name {lname} not found")
+        abort(404, f"Person with id {id} not found")
