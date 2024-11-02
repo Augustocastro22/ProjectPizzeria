@@ -1,0 +1,57 @@
+/* Fondo blanco para toda la página */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #f0f2f5; /* Fondo suave para toda la página */
+}
+
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  color: #333;
+}
+
+.App-header {
+  width: 90%;
+  max-width: 800px;
+  margin-top: 20px;
+}
+
+h1 {
+  color: #0a9fdd; /* Color azul para el título */
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* Estilo de la tabla */
+.MuiTableContainer-root {
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  font-weight: bold;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #0a9fdd; /* Azul oscuro para los encabezados */
+}
+
+.MuiTableBody-root .MuiTableCell-root {
+  font-size: 14px;
+  color: #555;
+  padding: 12px;
+}
+
+.MuiTableRow-root:nth-of-type(even) {
+  background-color: #f9f9f9; /* Alterna colores en las filas */
+}
+
+.MuiTableRow-root:hover {
+  background-color: #e0e7ff; /* Fondo azul claro al pasar el mouse */
+}

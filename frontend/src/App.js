@@ -1,39 +1,28 @@
-import logo from './logo.svg';
-import './App.css';
-
-import React, { useEffect, useState } from 'react';
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import { Container } from '@mui/material';
+import Home from './Home'; // Importa el nuevo archivo Home.js
+import ListadoClientes from './ListadoClientes';
+import PedidoNuevo from './PedidoNuevo';
 
 function App() {
-  const [clientes, setClientes] = useState([]);
-
-  useEffect(() => {
-    // Hacer una solicitud al backend para obtener los clientes
-    fetch('http://127.0.0.1:8000/api/clientes')
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('Error en la solicitud');
-        }
-        return response.json();
-      })
-      .then((data) => {
-        setClientes(data); // Guardar los datos de clientes en el estado
-      })
-      .catch((error) => {
-        console.error('Error al obtener los clientes:', error);
-      });
-  }, []);
-
   return (
-    <div className="App">
-      <header className="App-header">
-        <h1>Lista de Clientes</h1>
-        <ul>
-          {clientes.map((cliente) => (
-            <li key={cliente.id}>{cliente.id} {cliente.lname}</li>
-          ))}
-        </ul>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Navbar /> {/* Barra de navegación fija */}
+
+        {/* Contenedor principal para el contenido */}
+        <Container sx={{ marginTop: '80px' }}>
+          <Routes>
+            <Route path="/" element={<Home />} /> {/* Ruta raíz que apunta a Home.js */}
+            <Route path="/clientes" element={<ListadoClientes />} />
+            <Route path="/pedidos" element={<PedidoNuevo />} />
+          </Routes>
+        </Container>
+      </div>
+    </Router>
   );
 }
 
