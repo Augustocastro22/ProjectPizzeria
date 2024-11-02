@@ -1,11 +1,14 @@
+import logo from './logo.svg';
+import './ListadoClientes.css';
+
 import React, { useEffect, useState } from 'react';
-import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Button } from "@mui/material";
+import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
 function ListadoClientes() {
   const [clientes, setClientes] = useState([]);
-  const [editingClienteId, setEditingClienteId] = useState(null);
-  const [editedCliente, setEditedCliente] = useState({});
+  const [searchTerm, setSearchTerm] = useState(''); // Estado para la búsqueda por apellido
+  const [dniSearchTerm, setDniSearchTerm] = useState(''); // Estado para la búsqueda por DNI
 
   useEffect(() => {
     fetch('http://127.0.0.1:8000/api/clientes')
@@ -24,17 +27,16 @@ function ListadoClientes() {
   }, []);
 
   const handleEdit = (cliente) => {
-    setEditingClienteId(cliente.id);
-    setEditedCliente(cliente);
-  };
+    const nuevoNombre = prompt("Nuevo nombre:", cliente.fname);
+    if (!nuevoNombre) return;
+    const updatedCliente = { fname: nuevoNombre };
 
-  const handleSave = () => {
-    fetch(`http://127.0.0.1:8000/api/clientes/${editedCliente.lname}`, {
+    fetch(`http://127.0.0.1:8000/api/clientes/${cliente.lname}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(editedCliente)
+      body: JSON.stringify(updatedCliente)
     })
     .then((response) => {
       if (!response.ok) {
@@ -44,10 +46,8 @@ function ListadoClientes() {
     })
     .then((updatedCliente) => {
       setClientes((prevClientes) =>
-        prevClientes.map((c) => (c.id === updatedCliente.id ? updatedCliente : c))
+        prevClientes.map((c) => (c.lname === cliente.lname ? updatedCliente : c))
       );
-      setEditingClienteId(null);
-      setEditedCliente({});
     })
     .catch((error) => console.error('Error al editar el cliente:', error));
   };
@@ -68,15 +68,35 @@ function ListadoClientes() {
     }
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setEditedCliente({ ...editedCliente, [name]: value });
-  };
+  // Filtrar clientes en base al término de búsqueda de apellido y coincidencia inicial en DNI
+  const filteredClientes = clientes.filter((cliente) =>
+    cliente.lname.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    cliente.dni.toString().startsWith(dniSearchTerm) // Verifica que el DNI empiece con los caracteres de búsqueda
+  );
 
   return (
     <div className="ListadoClientes">
       <header className="ListadoClientes-header">
         <h1>Lista de Clientes</h1>
+
+        {/* Campo de búsqueda por apellido */}
+        <TextField
+          label="Buscar por apellido"
+          variant="outlined"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          sx={{ marginBottom: '20px', width: '100%' }}
+        />
+
+        {/* Campo de búsqueda por DNI */}
+        <TextField
+          label="Buscar por DNI"
+          variant="outlined"
+          value={dniSearchTerm}
+          onChange={(e) => setDniSearchTerm(e.target.value)}
+          sx={{ marginBottom: '20px', width: '100%' }}
+        />
+
         <TableContainer component={Paper}>
           <Table aria-label="Clientes">
             <TableHead>
@@ -88,41 +108,15 @@ function ListadoClientes() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {clientes.map((cliente) => (
+              {filteredClientes.map((cliente) => (
                 <TableRow key={cliente.id}>
                   <TableCell>{cliente.dni}</TableCell>
+                  <TableCell>{cliente.fname}</TableCell>
+                  <TableCell>{cliente.lname}</TableCell>
                   <TableCell>
-                    {editingClienteId === cliente.id ? (
-                      <TextField
-                        name="fname"
-                        value={editedCliente.fname}
-                        onChange={handleInputChange}
-                      />
-                    ) : (
-                      cliente.fname
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {editingClienteId === cliente.id ? (
-                      <TextField
-                        name="lname"
-                        value={editedCliente.lname}
-                        onChange={handleInputChange}
-                      />
-                    ) : (
-                      cliente.lname
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {editingClienteId === cliente.id ? (
-                      <Button variant="contained" color="primary" onClick={handleSave}>
-                        Guardar
-                      </Button>
-                    ) : (
-                      <IconButton color="primary" onClick={() => handleEdit(cliente)}>
-                        <EditIcon />
-                      </IconButton>
-                    )}
+                    <IconButton color="primary" onClick={() => handleEdit(cliente)}>
+                      <EditIcon />
+                    </IconButton>
                     <IconButton color="secondary" onClick={() => handleDelete(cliente.lname)}>
                       <DeleteIcon />
                     </IconButton>

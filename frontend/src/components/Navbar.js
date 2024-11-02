@@ -8,7 +8,7 @@ const Navbar = () => {
       <Toolbar>
         {/* Texto "Surffing Pizza" como enlace a la Home */}
         <Typography variant="h6" component={Link} to="/" sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}>
-          Surffing Pizza
+          Surfing Pizza
         </Typography>
 
         {/* Botones de navegación */}
