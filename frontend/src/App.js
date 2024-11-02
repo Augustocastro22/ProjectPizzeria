@@ -8,7 +8,7 @@ function App() {
 
   useEffect(() => {
     // Hacer una solicitud al backend para obtener los clientes
-    fetch('/api/clientes')
+    fetch('http://127.0.0.1:8000/api/clientes')
       .then((response) => {
         if (!response.ok) {
           throw new Error('Error en la solicitud');
@@ -29,7 +29,7 @@ function App() {
         <h1>Lista de Clientes</h1>
         <ul>
           {clientes.map((cliente) => (
-            <li key={cliente.id}>{cliente.name}</li>
+            <li key={cliente.id}>{cliente.id} {cliente.lname}</li>
           ))}
         </ul>
       </header>

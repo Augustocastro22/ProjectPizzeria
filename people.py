@@ -2,7 +2,6 @@ from config import db
 from flask import abort, make_response
 from models import Person, people_schema, person_schema
 
-
 def read_all():
     people = Person.query.all()
     return people_schema.dump(people)
