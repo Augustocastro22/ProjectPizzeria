@@ -126,6 +126,7 @@ const PedidoNuevo = () => {
 
             if (response.ok) {
                 const data = await response.json();
+                setCliente((prev) => ({...prev, id: data.id})); // Asigna el id del cliente recién creado
             } else {
                 const error = await response.json();
                 alert(`Error: ${error.message}`);
@@ -135,6 +136,7 @@ const PedidoNuevo = () => {
             console.error('Error:', error);
         }
     };
+
 
     return (
         <Container maxWidth="sm">
@@ -191,7 +193,7 @@ const PedidoNuevo = () => {
             >
                 <MenuItem value="" disabled>Seleccionar Pizza</MenuItem>
                 <MenuItem value="Cuatro Quesos">Cuatro Quesos</MenuItem>
-                <MenuItem value="Especial">Pepperoni</MenuItem>
+                <MenuItem value="Especial">Especial</MenuItem>
                 <MenuItem value="Margherita">Margherita</MenuItem>
                 <MenuItem value="Muzzarella">Muzzarella</MenuItem>
                 <MenuItem value="Pepperoni">Pepperoni</MenuItem>
@@ -212,9 +214,11 @@ const PedidoNuevo = () => {
                 color="secondary"
                 onClick={handleAddPizza}
                 style={{marginTop: '16px'}}
+                disabled={!cliente.id} // Deshabilita si el cliente no tiene un ID
             >
                 Agregar Pizza
             </Button>
+
 
             <Typography variant="h6" style={{marginTop: '32px'}}>Carrito</Typography>
             <List>
@@ -233,9 +237,11 @@ const PedidoNuevo = () => {
                 color="success"
                 onClick={handleRealizarPedido}
                 style={{marginTop: '16px'}}
+                disabled={!cliente.id} // Deshabilita si el cliente no tiene un ID
             >
                 Realizar Pedido
             </Button>
+
         </Container>
     );
 };

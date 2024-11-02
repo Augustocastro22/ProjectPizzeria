@@ -1,15 +1,13 @@
-import logo from './logo.svg';
-import './ListadoClientes.css';
-
 import React, { useEffect, useState } from 'react';
-import {IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
+import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Button } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 
 function ListadoClientes() {
   const [clientes, setClientes] = useState([]);
+  const [editingClienteId, setEditingClienteId] = useState(null);
+  const [editedCliente, setEditedCliente] = useState({});
 
   useEffect(() => {
-    // Hacer una solicitud al backend para obtener los clientes
     fetch('http://127.0.0.1:8000/api/clientes')
       .then((response) => {
         if (!response.ok) {
@@ -18,66 +16,62 @@ function ListadoClientes() {
         return response.json();
       })
       .then((data) => {
-        setClientes(data); // Guardar los datos de clientes en el estado
+        setClientes(data);
       })
       .catch((error) => {
         console.error('Error al obtener los clientes:', error);
       });
   }, []);
 
- const handleEdit = (cliente) => {
-  // Pedir al usuario que ingrese el nuevo nombre
-  const nuevoNombre = prompt("Nuevo nombre:", cliente.fname);
+  const handleEdit = (cliente) => {
+    setEditingClienteId(cliente.id);
+    setEditedCliente(cliente);
+  };
 
-  // Si el usuario cancela el prompt, no se hace nada
-  if (!nuevoNombre) return;
-
-  // Crear el objeto actualizado con el nuevo nombre
-  const updatedCliente = { fname: nuevoNombre };
-
-  fetch(`http://127.0.0.1:8000/api/clientes/${cliente.lname}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(updatedCliente) // Convertir el objeto a JSON
-  })
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error('Error al actualizar el cliente');
-    }
-    return response.json();
-  })
-  .then((updatedCliente) => {
-    // Actualizar el estado del cliente en la lista
-    setClientes((prevClientes) =>
-      prevClientes.map((c) => (c.lname === cliente.lname ? updatedCliente : c))
-    );
-  })
-  .catch((error) => console.error('Error al editar el cliente:', error));
-};
-
-
-  const handleDelete = (lname) => {
-  // Pregunta al usuario si está seguro de querer eliminar el cliente
-  const confirmDelete = window.confirm(`¿Estás seguro de que deseas eliminar a ${lname}?`);
-
-  // Si el usuario confirma, procede con la eliminación
-  if (confirmDelete) {
-    fetch(`http://127.0.0.1:8000/api/clientes/${lname}`, {
-      method: 'DELETE'
+  const handleSave = () => {
+    fetch(`http://127.0.0.1:8000/api/clientes/${editedCliente.lname}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(editedCliente)
     })
     .then((response) => {
       if (!response.ok) {
-        throw new Error('Error al eliminar el cliente');
+        throw new Error('Error al actualizar el cliente');
       }
-      // Actualiza el estado para eliminar el cliente de la lista
-      setClientes((prevClientes) => prevClientes.filter((c) => c.lname !== lname));
+      return response.json();
     })
-    .catch((error) => console.error('Error al eliminar el cliente:', error));
-  }
-};
+    .then((updatedCliente) => {
+      setClientes((prevClientes) =>
+        prevClientes.map((c) => (c.id === updatedCliente.id ? updatedCliente : c))
+      );
+      setEditingClienteId(null);
+      setEditedCliente({});
+    })
+    .catch((error) => console.error('Error al editar el cliente:', error));
+  };
 
+  const handleDelete = (lname) => {
+    const confirmDelete = window.confirm(`¿Estás seguro de que deseas eliminar a ${lname}?`);
+    if (confirmDelete) {
+      fetch(`http://127.0.0.1:8000/api/clientes/${lname}`, {
+        method: 'DELETE'
+      })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Error al eliminar el cliente');
+        }
+        setClientes((prevClientes) => prevClientes.filter((c) => c.lname !== lname));
+      })
+      .catch((error) => console.error('Error al eliminar el cliente:', error));
+    }
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditedCliente({ ...editedCliente, [name]: value });
+  };
 
   return (
     <div className="ListadoClientes">
@@ -97,12 +91,38 @@ function ListadoClientes() {
               {clientes.map((cliente) => (
                 <TableRow key={cliente.id}>
                   <TableCell>{cliente.dni}</TableCell>
-                  <TableCell>{cliente.fname}</TableCell>
-                  <TableCell>{cliente.lname}</TableCell>
                   <TableCell>
-                    <IconButton color="primary" onClick={() => handleEdit(cliente.lname)}>
-                      <EditIcon />
-                    </IconButton>
+                    {editingClienteId === cliente.id ? (
+                      <TextField
+                        name="fname"
+                        value={editedCliente.fname}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      cliente.fname
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingClienteId === cliente.id ? (
+                      <TextField
+                        name="lname"
+                        value={editedCliente.lname}
+                        onChange={handleInputChange}
+                      />
+                    ) : (
+                      cliente.lname
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {editingClienteId === cliente.id ? (
+                      <Button variant="contained" color="primary" onClick={handleSave}>
+                        Guardar
+                      </Button>
+                    ) : (
+                      <IconButton color="primary" onClick={() => handleEdit(cliente)}>
+                        <EditIcon />
+                      </IconButton>
+                    )}
                     <IconButton color="secondary" onClick={() => handleDelete(cliente.lname)}>
                       <DeleteIcon />
                     </IconButton>
