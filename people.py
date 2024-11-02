@@ -7,7 +7,10 @@ def read_all():
     return people_schema.dump(people)
 
 
-def create(person):
+from flask import request, abort
+
+def create():
+    person = request.get_json()  # Obtener el cuerpo de la solicitud en formato JSON
     lname = person.get("lname")
     existing_person = Person.query.filter(Person.lname == lname).one_or_none()
 
@@ -18,6 +21,14 @@ def create(person):
         return person_schema.dump(new_person), 201
     else:
         abort(406, f"Person with last name {lname} already exists")
+
+def read_one_by_dni(dni):
+    person = Person.query.filter(Person.dni == dni).one_or_none()  # Suponiendo que tienes un campo 'dni' en tu modelo Person
+    print(dni)
+    if person is not None:
+        return person_schema.dump(person)
+    else:
+        abort(404, f"Person with DNI {dni} not found")
 
 
 def read_one(lname):

@@ -26,10 +26,9 @@ class Person(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     lname = db.Column(db.String(32), unique=True)
     fname = db.Column(db.String(32))
-    timestamp = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
-    
+    dni = db.Column(db.String(32), unique=True)  # Nuevo campo DNI
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
     pizzas = db.relationship(
         Pizza,
         backref="person",
