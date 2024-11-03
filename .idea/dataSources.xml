@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="people" uuid="53e47ecb-cf9c-4a54-b741-263e365c13e2">
-      <driver-ref>sqlite.xerial</driver-ref>
+      <driver-ref>6093bbb8-a371-4630-ad25-eef50334520b</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:C:\Users\Usuario\PycharmProjects\Surfing Pizza\rp_flask_api\people.db</jdbc-url>

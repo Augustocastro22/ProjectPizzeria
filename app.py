@@ -23,7 +23,7 @@ def get_people():
     return jsonify(people)
 app.add_url_rule('/api/create_people', 'create_people', create, methods=['POST'])
 
-@app.route("/api/people/dni/<string:dni>", methods=['GET'])  # Ruta definida aquí
+@app.route("/api/people/<string:dni>", methods=['GET'])  # Ruta definida aquí
 def get_person_by_dni(dni):
     return read_one_by_dni(dni)  # Llama a la función de people.py
 

@@ -32,7 +32,7 @@ const PedidoNuevo = () => {
         if (!dni) return;
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/people/dni/${dni}`);
+            const response = await fetch(`http://127.0.0.1:8000/api/people/${dni}`);
             if (response.ok) {
                 const data = await response.json();
                 setCliente({dni: data.dni, nombre: data.fname, apellido: data.lname, id: data.id});
