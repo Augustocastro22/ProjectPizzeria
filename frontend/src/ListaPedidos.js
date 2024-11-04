@@ -24,6 +24,9 @@ const GroupedPizzas = () => {
     const [groupedPizzas, setGroupedPizzas] = useState([]);
     const [editedPizzas, setEditedPizzas] = useState({});
     const [newPizza, setNewPizza] = useState({type: '', customName: ''});
+    const [clientFilter, setClientFilter] = useState(''); // Filtro por cliente
+    const [dateFilter, setDateFilter] = useState('');     // Filtro por fecha
+
 
     useEffect(() => {
         const fetchGroupedPizzas = async () => {
@@ -60,7 +63,11 @@ const GroupedPizzas = () => {
             return;
         }
 
-        updatedPizza.timestamp = timestamp;
+        const formattedPizza = {
+            person_id: updatedPizza.person_id,
+            content: updatedPizza.content,
+            timestamp: timestamp
+        };
 
         try {
             const response = await fetch(`http://127.0.0.1:8000/api/pizzas/${id}`, {
@@ -68,24 +75,39 @@ const GroupedPizzas = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(updatedPizza)
+                body: JSON.stringify(formattedPizza)
             });
 
             if (response.ok) {
+                const updatedPizzaFromServer = await response.json();
+
                 Swal.fire({
                     icon: 'success',
                     title: '¡Éxito!',
                     text: 'El pedido se ha actualizado correctamente.',
                     confirmButtonText: 'Aceptar'
-                }).then(() => {
-                    setEditedPizzas(prevState => ({
-                        ...prevState,
-                        [timestamp]: {
-                            ...prevState[timestamp],
-                            [id]: undefined
-                        }
-                    }));
                 });
+
+                setGroupedPizzas(prevGroups =>
+                    prevGroups.map(group =>
+                        group.timestamp === timestamp
+                            ? {
+                                ...group,
+                                pizzas: group.pizzas.map(pizza =>
+                                    pizza.id === id ? { ...pizza, ...updatedPizzaFromServer } : pizza
+                                )
+                              }
+                            : group
+                    )
+                );
+
+                setEditedPizzas(prevState => ({
+                    ...prevState,
+                    [timestamp]: {
+                        ...prevState[timestamp],
+                        [id]: undefined
+                    }
+                }));
             } else {
                 Swal.fire({
                     icon: 'error',
@@ -209,6 +231,18 @@ const GroupedPizzas = () => {
         }
     };
 
+    const filteredGroupedPizzas = groupedPizzas.filter(group => {
+    const clientName = `${group.pizzas[0]?.client?.fname} ${group.pizzas[0]?.client?.lname}`.toLowerCase();
+    const matchesClient = clientFilter ? clientName.includes(clientFilter.toLowerCase()) : true;
+
+    // Formato de fecha para que coincida solo con la parte de la fecha (YYYY-MM-DD)
+    const groupDate = group.timestamp.split(' ')[0];  // Solo toma la fecha, ignora la hora
+    const matchesDate = dateFilter ? groupDate === dateFilter : true;
+
+    return matchesClient && matchesDate;
+});
+
+
 
     return (
         <div className="ListadoClientes">
@@ -216,7 +250,28 @@ const GroupedPizzas = () => {
                 <Typography variant="h2" align="center" gutterBottom sx={{color: '#0a9fdd', fontWeight: 'bold'}}>
                     Pedidos
                 </Typography>
-                {groupedPizzas.map(group => (
+                <Box display="flex" gap={2} mb={3}>
+                    <TextField
+                        label="Buscar por cliente"
+                        variant="outlined"
+                        value={clientFilter}
+                        onChange={(e) => setClientFilter(e.target.value)} // Actualiza el estado al escribir
+                        sx={{ flex: 1 }}
+                    />
+                    <TextField
+                        label="Buscar por fecha"
+                        type="date"
+                        variant="outlined"
+                        value={dateFilter}
+                        onChange={(e) => setDateFilter(e.target.value)}
+                        sx={{ flex: 1 }}
+                        InputLabelProps={{
+                            shrink: true
+                        }}
+                    />
+                </Box>
+
+                {filteredGroupedPizzas.map(group => (
                     <Box key={group.timestamp} mb={4}
                          sx={{padding: '20px', borderRadius: '10px', boxShadow: 3, backgroundColor: '#f5f5f5'}}>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -301,7 +356,11 @@ const GroupedPizzas = () => {
                                     value={newPizza.type}
                                     onChange={(e) => setNewPizza({type: e.target.value, customName: ''})}
                                 >
+                                    <MenuItem value="" disabled>Seleccionar Pizza</MenuItem>
+                                    <MenuItem value="Cuatro Quesos">Cuatro Quesos</MenuItem>
+                                    <MenuItem value="Especial">Especial</MenuItem>
                                     <MenuItem value="Margherita">Margherita</MenuItem>
+                                    <MenuItem value="Muzzarella">Muzzarella</MenuItem>
                                     <MenuItem value="Pepperoni">Pepperoni</MenuItem>
                                     <MenuItem value="Otra">Otra</MenuItem>
                                 </Select>
