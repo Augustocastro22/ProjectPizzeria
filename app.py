@@ -20,24 +20,24 @@ def get_people():
 
 app.add_url_rule('/api/create_people', 'create_people', create, methods=['POST'])
 
-@app.route("/api/people/<string:dni>", methods=['GET'])  # Ruta definida aquí
+@app.route("/api/people/<string:dni>", methods=['GET'])
 def get_person_by_dni(dni):
-    return read_one_by_dni(dni)  # Llama a la función de people.py
+    return read_one_by_dni(dni)
 
 @app.route("/api/clientes/<id>", methods=["PUT"])
 def update_person(id):
-    person_data = request.get_json()  # Obtener los datos de la solicitud
+    person_data = request.get_json()
     return people.update(id, person_data)
 
-# Ruta para eliminar un cliente por su apellido (lname)
+
 @app.route("/api/clientes/<id>", methods=["DELETE"])
 def delete_person(id):
     return delete(id)
 @app.route('/api/pizzas', methods=['POST'])
 def create_pizza():
-    pizza_data = request.get_json()  # Obtén los datos JSON de la solicitud
+    pizza_data = request.get_json()
     print(pizza_data)
-    return pizzas.create(pizza_data)  # Llama a la función create con los datos de la pizza
+    return pizzas.create(pizza_data)
 
 @app.route('/api/grouped_pizzas', methods=['GET'])
 def get_grouped_pizzas():
@@ -46,11 +46,11 @@ def get_grouped_pizzas():
 
 @app.route('/api/pizzas/<id>', methods=['PUT'])
 def update_pizza(id):
-    pizza_data = request.get_json()  # Obtén los datos JSON de la solicitud
+    pizza_data = request.get_json()
     if not pizza_data or 'content' not in pizza_data:
-        abort(400, "Missing 'content' in request data")  # Verifica que 'content' esté presente
+        abort(400, "Missing 'content' in request data")
 
-    return pizzas.update(id, pizza_data)  # Llama a la función de actualización
+    return pizzas.update(id, pizza_data)
 
 @app.route('/api/pizzas/<id>', methods=['DELETE'])
 def delete_pizza(id):

@@ -3,7 +3,7 @@ body, html {
   margin: 0;
   padding: 0;
   height: 100%;
-  background-color: #f0f2f5; /* Fondo suave para toda la página */
+  background-color: #f0f2f5;
 }
 
 .App {
@@ -24,32 +24,32 @@ body, html {
 h1 {
     margin: 0;
     font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-    font-weight: 700; /* Aquí cambié a 700 porque estaba en el segundo código */
-    font-size: 3.75rem; /* Ajuste de tamaño de fuente */
+    font-weight: 700;
+    font-size: 3.75rem;
     line-height: 1.2;
     letter-spacing: -0.00833em;
-    text-align: center; /* Añadido para centrar como en el segundo estilo */
-    margin-bottom: 0.35em; /* Mantener el espacio inferior */
-    color: #0a9fdd; /* Color azul */
+    text-align: center;
+    margin-bottom: 0.35em;
+    color: #0a9fdd;
 }
 
 
 /* Estilo de la tabla */
 .MuiTableContainer-root {
-  border-radius: 8px; /* Bordes redondeados */
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Sombra suave */
-  max-height: 400px; /* Altura máxima del contenedor de la tabla */
-  overflow-y: auto; /* Habilita el desplazamiento vertical */
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  max-height: 400px;
+  overflow-y: auto;
 }
 
 .MuiTableHead-root .MuiTableCell-root {
   font-weight: bold;
   font-size: 16px;
   color: #ffffff;
-  background-color: #0a9fdd; /* Azul oscuro para los encabezados */
-  position: sticky; /* Hace que el encabezado se mantenga fijo */
-  top: 0; /* Posición fija en la parte superior */
-  z-index: 1; /* Asegura que esté encima del contenido de la tabla */
+  background-color: #0a9fdd;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .MuiTableBody-root .MuiTableCell-root {
@@ -59,9 +59,9 @@ h1 {
 }
 
 .MuiTableRow-root:nth-of-type(even) {
-  background-color: #f9f9f9; /* Alterna colores en las filas */
+  background-color: #f9f9f9;
 }
 
 .MuiTableRow-root:hover {
-  background-color: #e0e7ff; /* Fondo azul claro al pasar el mouse */
+  background-color: #e0e7ff;
 }

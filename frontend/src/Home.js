@@ -1,7 +1,7 @@
 // src/Home.js
 import React from 'react';
 import { Box, Typography, Card, CardContent, CardMedia } from '@mui/material';
-import { Link } from 'react-router-dom'; // Importa Link de react-router-dom
+import { Link } from 'react-router-dom';
 
 // Imagen fija para el banner principal
 const bannerImage = '/images/banner1.jpg';
@@ -20,8 +20,6 @@ const Home = () => {
       <Box sx={{ width: '100%', height: '300px', marginBottom: '30px', borderRadius: '10px', overflow: 'hidden' }}>
         <img src={bannerImage} alt="banner" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       </Box>
-
-      {/* Banners de acceso rápido en una fila */}
       <Box
         sx={{
           display: 'flex',
