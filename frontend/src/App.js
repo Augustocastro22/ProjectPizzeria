@@ -6,6 +6,7 @@ import { Container } from '@mui/material';
 import Home from './Home'; // Importa el nuevo archivo Home.js
 import ListadoClientes from './ListadoClientes';
 import PedidoNuevo from './PedidoNuevo';
+import ListaPedidos from './ListaPedidos';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/" element={<Home />} /> {/* Ruta raíz que apunta a Home.js */}
             <Route path="/clientes" element={<ListadoClientes />} />
             <Route path="/pedidos" element={<PedidoNuevo />} />
+            <Route path="/ListaPedidos" element={<ListaPedidos />} />
           </Routes>
         </Container>
       </div>

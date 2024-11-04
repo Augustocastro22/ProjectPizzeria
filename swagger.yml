@@ -57,7 +57,7 @@ components:
         type: "integer"
 
 paths:
-  /people:
+  /api/people:
     get:
       operationId: "people.read_all"
       tags:
@@ -72,7 +72,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Person"
-
     post:
       operationId: "people.create"
       tags:
@@ -95,7 +94,7 @@ paths:
         "406":
           description: "Person with specified DNI already exists"
 
-  /people/{dni}:
+  /api/people/{dni}:
     get:
       operationId: "people.read_one_by_dni"
       tags:
@@ -113,7 +112,7 @@ paths:
         "404":
           description: "Person with specified DNI not found"
 
-  /people/{id}:
+  /api/people/{id}:
     put:
       operationId: "people.update"
       tags:
@@ -151,7 +150,7 @@ paths:
         "404":
           description: "Person with specified ID not found"
 
-  /pizzas:
+  /api/pizzas:
     post:
       operationId: "pizzas.create"
       tags:
@@ -168,7 +167,7 @@ paths:
         "201":
           description: "Successfully created a pizza"
 
-  /pizzas/{pizza_id}:
+  /api/pizzas/{pizza_id}:
     get:
       operationId: "pizzas.read_one"
       tags:

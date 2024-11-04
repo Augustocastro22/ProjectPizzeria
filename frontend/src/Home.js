@@ -10,7 +10,7 @@ const bannerImage = '/images/banner1.jpg';
 // Lista de banners de acceso rápido
 const quickAccess = [
   { title: 'Listado de Clientes', image: '/images/clientes.jpg', link: '/clientes' },
-  { title: 'Listado de Pedidos', image: '/images/pedidos.jpg', link: '/pedidos' },
+  { title: 'Listado de Pedidos', image: '/images/pedidos.jpg', link: '/ListaPedidos' },
   { title: 'Nuevo Pedido', image: '/images/nuevopedido.jpg', link: '/pedidos' },
 ];
 
