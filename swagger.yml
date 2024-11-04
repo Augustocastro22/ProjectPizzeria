@@ -219,3 +219,47 @@ paths:
           description: "Successfully deleted pizza"
         "404":
           description: "Pizza not found"
+
+  /api/grouped_pizzas:
+    get:
+      summary: "Obtiene las pizzas agrupadas por fecha y cliente."
+      tags:
+        - "Pizzas"
+      operationId: "pizzas.get_pizza_group"  # Asegúrate de que esto esté completo y coincida con el módulo donde está definida la función
+      responses:
+        '200':
+          description: "Lista de pizzas agrupadas por fecha y cliente"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    timestamp:
+                      type: "string"
+                      format: "date-time"
+                      description: "Fecha y hora en el formato YYYY-MM-DD HH:MM"
+                    pizzas:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "integer"
+                            description: "ID de la pizza"
+                          content:
+                            type: "string"
+                            description: "Descripción de la pizza"
+                          client:
+                            type: "object"
+                            properties:
+                              fname:
+                                type: "string"
+                                description: "Nombre del cliente"
+                              lname:
+                                type: "string"
+                                description: "Apellido del cliente"
+                              id:
+                                type: "integer"
+                                description: "ID del cliente"

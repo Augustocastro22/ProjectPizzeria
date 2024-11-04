@@ -26,6 +26,8 @@ const GroupedPizzas = () => {
     const [newPizza, setNewPizza] = useState({type: '', customName: ''});
     const [clientFilter, setClientFilter] = useState(''); // Filtro por cliente
     const [dateFilter, setDateFilter] = useState('');     // Filtro por fecha
+    const [dateEdits, setDateEdits] = useState({}); // Estado para almacenar la fecha y hora de edición para cada grupo
+    const [isEditingDate, setIsEditingDate] = useState({}); // Estado para controlar la visibilidad del editor de fecha
 
 
     useEffect(() => {
@@ -84,7 +86,7 @@ const GroupedPizzas = () => {
                 Swal.fire({
                     icon: 'success',
                     title: '¡Éxito!',
-                    text: 'El pedido se ha actualizado correctamente.',
+                    text: 'El item se ha actualizado correctamente.',
                     confirmButtonText: 'Aceptar'
                 });
 
@@ -112,7 +114,7 @@ const GroupedPizzas = () => {
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: 'No se pudo actualizar el pedido. Inténtalo de nuevo.',
+                    text: 'No se pudo actualizar el item. Inténtalo de nuevo.',
                     confirmButtonText: 'Aceptar'
                 });
             }
@@ -120,7 +122,7 @@ const GroupedPizzas = () => {
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Hubo un error al intentar actualizar el pedido. Por favor, verifica tu conexión.',
+                text: 'Hubo un error al intentar actualizar el item. Por favor, verifica tu conexión.',
                 confirmButtonText: 'Aceptar'
             });
         }
@@ -139,7 +141,7 @@ const GroupedPizzas = () => {
     const handleDeleteGroup = (group) => {
         Swal.fire({
             title: '¿Estás seguro?',
-            text: "Esta acción eliminará todos los pedidos de este grupo.",
+            text: "Esta acción eliminará todos los items de este pedido.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
@@ -158,7 +160,7 @@ const GroupedPizzas = () => {
 
                 Swal.fire(
                     'Eliminado!',
-                    'Los pedidos han sido eliminados.',
+                    'El pedido han sido eliminados.',
                     'success'
                 );
 
@@ -170,7 +172,7 @@ const GroupedPizzas = () => {
     const handleDeletePizza = (groupTimestamp, pizzaId) => {
         Swal.fire({
             title: '¿Estás seguro?',
-            text: "Esta acción eliminará este pedido.",
+            text: "Esta acción eliminará este item.",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Sí, eliminar',
@@ -182,7 +184,7 @@ const GroupedPizzas = () => {
                         method: 'DELETE'
                     });
                     if (response.ok) {
-                        Swal.fire('Eliminado!', 'El pedido ha sido eliminado.', 'success');
+                        Swal.fire('Eliminado!', 'El item ha sido eliminado.', 'success');
                         setGroupedPizzas(prevGroups =>
                             prevGroups.map(group =>
                                 group.timestamp === groupTimestamp
@@ -192,7 +194,7 @@ const GroupedPizzas = () => {
                         );
                     }
                 } catch (error) {
-                    Swal.fire('Error', 'Hubo un problema al eliminar el pedido. Intenta nuevamente.', 'error');
+                    Swal.fire('Error', 'Hubo un problema al eliminar el item. Intenta nuevamente.', 'error');
                 }
             }
         });
@@ -242,7 +244,77 @@ const GroupedPizzas = () => {
     return matchesClient && matchesDate;
 });
 
+const saveGroupDateChange = async (group) => {
+    const newDateTime = dateEdits[group.timestamp];
 
+    if (!newDateTime) {
+        Swal.fire('Error', 'Por favor, selecciona una nueva fecha y hora.', 'error');
+        return;
+    }
+
+    // Formatear la fecha a 'YYYY-MM-DD HH:MM'
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    };
+
+    const formattedDate = formatDate(newDateTime);
+
+    // Actualizar la fecha para cada pizza en el grupo
+    const updatePromises = group.pizzas.map(async (pizza) => {
+        const updatedPizza = {
+            id: pizza.id,
+            timestamp: formattedDate,
+            content: pizza.content
+        };
+
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/pizzas/${pizza.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedPizza)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error al actualizar la pizza ${pizza.id}`);
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', `No se pudo actualizar la pizza ${pizza.id}.`, 'error');
+        }
+    });
+
+    await Promise.all(updatePromises);
+
+    // Actualizar el estado de groupedPizzas para reflejar el cambio sin recargar
+    setGroupedPizzas(prevGroups =>
+        prevGroups.map(g =>
+            g.timestamp === group.timestamp
+                ? { ...g, timestamp: formattedDate, pizzas: g.pizzas.map(pizza => ({ ...pizza, timestamp: formattedDate })) }
+                : g
+        )
+    );
+
+    Swal.fire('Éxito', 'La fecha del grupo se ha actualizado.', 'success');
+    setDateEdits(prevState => ({ ...prevState, [group.timestamp]: '' }));
+    setIsEditingDate(prevState => ({ ...prevState, [group.timestamp]: false }));
+};
+
+
+const handleGroupDateChange = (e, timestamp) => {
+        const { value } = e.target;
+        setDateEdits(prevState => ({
+            ...prevState,
+            [timestamp]: value // Almacena la nueva fecha seleccionada para el grupo
+        }));
+    };
 
     return (
         <div className="ListadoClientes">
@@ -271,18 +343,49 @@ const GroupedPizzas = () => {
                     />
                 </Box>
 
-                {filteredGroupedPizzas.map(group => (
-                    <Box key={group.timestamp} mb={4}
-                         sx={{padding: '20px', borderRadius: '10px', boxShadow: 3, backgroundColor: '#f5f5f5'}}>
+
+
+                        {filteredGroupedPizzas.map(group => (
+                    <Box key={group.timestamp} mb={4} sx={{ padding: '20px', borderRadius: '10px', boxShadow: 3, backgroundColor: '#f5f5f5' }}>
                         <Box display="flex" justifyContent="space-between" alignItems="center">
-                            <Typography variant="h5" sx={{fontWeight: 'bold', color: '#333'}}>
-                                Fecha: {new Date(group.timestamp).toLocaleDateString()}
+                            <Typography variant="h5" sx={{ fontWeight: 'bold', color: '#333' }}>
+                                Fecha: {new Date(group.timestamp).toLocaleString()} {/* Muestra fecha y hora */}
                             </Typography>
-                            <Button variant="outlined" color="error" onClick={() => handleDeleteGroup(group)}>
-                                Borrar grupo
+                            <Box display="flex" alignItems="center" gap={2}>
+                                 <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() =>
+                                    setIsEditingDate(prevState => ({
+                                        ...prevState,
+                                        [group.timestamp]: !prevState[group.timestamp]
+                                    }))
+                                }
+                            >
+                                {isEditingDate[group.timestamp] ? "Cancelar" : "Editar Fecha"}
                             </Button>
+                                {isEditingDate[group.timestamp] && (
+                            <Box display="flex" alignItems="center" gap={2} mt={2}>
+                                <TextField
+                                    label="Nueva Fecha y Hora"
+                                    type="datetime-local"
+                                    value={dateEdits[group.timestamp] || ''}
+                                    onChange={(e) => handleGroupDateChange(e, group.timestamp)}
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                                <Button variant="contained" color="primary" onClick={() => saveGroupDateChange(group)}>
+                                    Guardar Fecha y Hora
+                                </Button>
+                            </Box>
+                        )}
+                                  <Button variant="outlined" color="error" onClick={() => handleDeleteGroup(group)}>
+                                Borrar pedido
+                            </Button>
+                            </Box>
+
+
                         </Box>
-                        <Typography variant="subtitle1" sx={{marginBottom: '10px', color: '#666'}}>
+                        <Typography variant="subtitle1" sx={{ marginBottom: '10px', color: '#666' }}>
                             Cliente: {group.pizzas.length > 0 && `${group.pizzas[0].client.fname} ${group.pizzas[0].client.lname}`}
                         </Typography>
                         <List>

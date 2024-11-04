@@ -4,6 +4,7 @@ import './ListadoClientes.css';
 import React, { useEffect, useState } from 'react';
 import { IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Button } from "@mui/material";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import Swal from "sweetalert2";
 
 function ListadoClientes() {
   const [clientes, setClientes] = useState([]);
@@ -34,27 +35,47 @@ const [searchTerm, setSearchTerm] = useState(''); // Estado para la búsqueda po
 
   const handleSave = () => {
     fetch(`http://127.0.0.1:8000/api/clientes/${editedCliente.id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(editedCliente)
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(editedCliente)
     })
     .then((response) => {
-      if (!response.ok) {
-        throw new Error('Error al actualizar el cliente');
-      }
-      return response.json();
+        if (response.status === 400) {
+            return response.text().then(text => {
+                throw new Error(text);
+            });
+        } else if (!response.ok) {
+            throw new Error('Error al actualizar el cliente');
+        }
+        return response.json();
     })
     .then((updatedCliente) => {
-      setClientes((prevClientes) =>
-        prevClientes.map((c) => (c.id === updatedCliente.id ? updatedCliente : c))
-      );
-      setEditingClienteId(null);
-      setEditedCliente({});
+        setClientes((prevClientes) =>
+            prevClientes.map((c) => (c.id === updatedCliente.id ? updatedCliente : c))
+        );
+        setEditingClienteId(null);
+        setEditedCliente({});
+        // SweetAlert de éxito
+        Swal.fire({
+            title: 'Éxito',
+            text: 'Cliente actualizado correctamente.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
     })
-    .catch((error) => console.error('Error al editar el cliente:', error));
-  };
+    .catch((error) => {
+        console.error('Error al editar el cliente:', error);
+        // SweetAlert de error
+        Swal.fire({
+            title: 'Error',
+            text: error.message,
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+    });
+};
 
   const handleDelete = (id) => {
     const confirmDelete = window.confirm(`¿Estás seguro de que deseas eliminar este cliente?`);

@@ -22,12 +22,17 @@ body, html {
 }
 
 h1 {
-  color: #0a9fdd; /* Color azul para el título */
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-align: center;
+    margin: 0;
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-weight: 700; /* Aquí cambié a 700 porque estaba en el segundo código */
+    font-size: 3.75rem; /* Ajuste de tamaño de fuente */
+    line-height: 1.2;
+    letter-spacing: -0.00833em;
+    text-align: center; /* Añadido para centrar como en el segundo estilo */
+    margin-bottom: 0.35em; /* Mantener el espacio inferior */
+    color: #0a9fdd; /* Color azul */
 }
+
 
 /* Estilo de la tabla */
 .MuiTableContainer-root {

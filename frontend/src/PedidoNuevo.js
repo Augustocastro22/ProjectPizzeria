@@ -140,7 +140,23 @@ const PedidoNuevo = () => {
 
     return (
         <Container maxWidth="sm">
-            <Typography variant="h4" gutterBottom>Nuevo Pedido</Typography>
+            <Typography
+                variant="h1"
+                gutterBottom
+                sx={{
+                    margin: 0,
+                    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+                    fontWeight: 700,
+                    fontSize: '3.75rem',
+                    lineHeight: 1.2,
+                    letterSpacing: '-0.00833em',
+                    textAlign: 'center',
+                    marginBottom: '0.35em',
+                    color: '#0a9fdd'
+                }}
+            >
+                Nuevo Pedido
+            </Typography>
 
             <Typography variant="h6">Información del Cliente</Typography>
             <TextField
