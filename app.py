@@ -52,5 +52,9 @@ def update_pizza(id):
 
     return pizzas.update(id, pizza_data)  # Llama a la función de actualización
 
+@app.route('/api/pizzas/<id>', methods=['DELETE'])
+def delete_pizza(id):
+    return pizzas.delete(id)
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

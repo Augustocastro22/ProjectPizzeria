@@ -3,7 +3,6 @@ import React from 'react';
 import { Box, Typography, Card, CardContent, CardMedia } from '@mui/material';
 import { Link } from 'react-router-dom'; // Importa Link de react-router-dom
 
-
 // Imagen fija para el banner principal
 const bannerImage = '/images/banner1.jpg';
 
@@ -33,12 +32,14 @@ const Home = () => {
         }}
       >
         {quickAccess.map((item, index) => (
-          <Card key={index} sx={{ cursor: 'pointer', width: { xs: '100%', sm: '32%' }, height: '350px' }}>
-            <CardMedia component="img" image={item.image} alt={item.title} height="280" style={{ borderRadius: '8px 8px 0 0' }} />
-            <CardContent>
-              <Typography variant="h6" align="center">{item.title}</Typography>
-            </CardContent>
-          </Card>
+          <Link to={item.link} key={index} style={{ textDecoration: 'none', width: '100%', height: '100%' }}>
+            <Card sx={{ cursor: 'pointer', width: { xs: '100%', sm: '100%' }, height: '350px' }}>
+              <CardMedia component="img" image={item.image} alt={item.title} height="280" style={{ borderRadius: '8px 8px 0 0' }} />
+              <CardContent>
+                <Typography variant="h6" align="center">{item.title}</Typography>
+              </CardContent>
+            </Card>
+          </Link>
         ))}
       </Box>
     </Box>
