@@ -79,7 +79,7 @@ const PedidoNuevo = () => {
             };
 
             try {
-                const response = await fetch('http://127.0.0.1:8000/api/create_pizza', {
+                const response = await fetch('http://127.0.0.1:8000/api/pizzas', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

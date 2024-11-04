@@ -33,7 +33,7 @@ def update_person(id):
 @app.route("/api/clientes/<id>", methods=["DELETE"])
 def delete_person(id):
     return delete(id)
-@app.route('/api/create_pizza', methods=['POST'])
+@app.route('/api/pizzas', methods=['POST'])
 def create_pizza():
     pizza_data = request.get_json()  # Obtén los datos JSON de la solicitud
     print(pizza_data)

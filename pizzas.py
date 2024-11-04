@@ -70,7 +70,8 @@ def get_pizza_group():
         Pizza.id,
         Pizza.content,
         Person.fname.label('client_fname'),
-        Person.lname.label('client_lname')
+        Person.lname.label('client_lname'),
+        Person.id.label('client_id')
     ).join(Person, Pizza.person_id == Person.id).order_by(
         func.strftime('%Y-%m-%d %H:%M', Pizza.timestamp)
     ).all()
@@ -84,7 +85,8 @@ def get_pizza_group():
             'content': row.content,
             'client': {
                 'fname': row.client_fname,
-                'lname': row.client_lname
+                'lname': row.client_lname,
+                'id': row.client_id
             }
         }
         if timestamp_rounded not in grouped_pizzas_dict:
